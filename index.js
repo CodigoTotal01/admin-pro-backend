@@ -10,6 +10,9 @@ const app = express();
 //modleware, eejcuta siempre la funcion siempre que pase por este punto
 app.use(cors());
 
+//Lectura y parseo del body
+app.use(express.json())
+
 
 //base de datos 
 dbConnection();
@@ -22,6 +25,14 @@ app.get('/', (req, res) => {
         msg: "Hola Mundo"
     })
 });
+
+
+
+app.use('/api/usuarios', require("./routes/usuarios"))
+//ruta - (req - res) controlador
+app.use('/api/login', require("./routes/auth"))
+
+
 
 //levantar el servidor
 app.listen(process.env.PORT, () => {
