@@ -4,16 +4,27 @@ const bcryptjs = require('bcryptjs')
 const {generarJWT} = require("../helpers/jwt");
 //atrapar o optener los errores de nuestro express validator recolecto
 
-const getUsuarios = async (req, res) => {
+const getUsuarios = async(req, res) => {
 
-    const usuarios = await Usuario.find();
-    res.status(400).json({
+    const desde = Number(req.query.desde) || 0;
+
+    const [ usuarios, total ] = await Promise.all([
+        Usuario
+            .find({}, 'nombre email role google img')
+            .skip( desde )
+            .limit( 5 ),
+
+        Usuario.countDocuments()
+    ]);
+
+
+    res.json({
         ok: true,
         usuarios,
-        uid: req.uid
-    })
+        total
+    });
 
-};
+}
 
 const crearUsuario = async (req, res = response) => {
 
@@ -60,34 +71,34 @@ const crearUsuario = async (req, res = response) => {
 };
 
 const actualizarUsuario = async (req, res = response) => {
-    const uid = req.params.id; // parans util cundo desde ndode definirmos el nombre que que recivirimos como variablen oquiere decir que esto enviara el usuario;
+        const uid = req.params.id; // parans util cundo desde ndode definirmos el nombre que que recivirimos como variablen oquiere decir que esto enviara el usuario;
 
-    try {
-        const usuarioDB = await Usuario.findById(uid);
-        if (!usuarioDB) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'No existe un usuario con ese id'
-            });
-        }
-        //campos enviados desde el cliente, extraer campos
-        const {password, google, email, ...campos} = req.body;
-
-
-        if (usuarioDB.email !== email) {
-        console.log("Soy una consulta inecesaria ")
-            //cambiar a un correo electronico que existe en mi base de datos
-            const existeEmail = await Usuario.findOne({email});
-
-            if (existeEmail) {
-                return res.status(400).json({
-                    ok: false, msg: "Ya existe este usuario con este email"
-                })
-
+        try {
+            const usuarioDB = await Usuario.findById(uid);
+            if (!usuarioDB) {
+                return res.status(404).json({
+                    ok: false,
+                    msg: 'No existe un usuario con ese id'
+                });
             }
-        }
+            //campos enviados desde el cliente, extraer campos
+            const {password, google, email, ...campos} = req.body;
 
-        campos.email = email;
+
+            if (usuarioDB.email !== email) {
+                console.log("Soy una consulta inecesaria ")
+                //cambiar a un correo electronico que existe en mi base de datos
+                const existeEmail = await Usuario.findOne({email});
+
+                if (existeEmail) {
+                    return res.status(400).json({
+                        ok: false, msg: "Ya existe este usuario con este email"
+                    })
+
+                }
+            }
+
+            campos.email = email;
             //actualizar el usuario en la db, cmoomngoose nos mandara la informacionde ANTES como se veia, peor molesta
             const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, {new: true});
 
@@ -97,10 +108,8 @@ const actualizarUsuario = async (req, res = response) => {
                 usuario: usuarioActualizado
             });
 
-        }
-    catch
-        (e)
-        {
+        } catch
+            (e) {
             console.log(e);
             res.status(500).json({
                 ok: false,
@@ -108,45 +117,43 @@ const actualizarUsuario = async (req, res = response) => {
             });
         }
     }
-    ;
+;
 
 
 const borrarUsuario = async (req, res) => {
 
     const uid = req.params.id;
 
-        try{
+    try {
 
-            const usuarioDB = await Usuario.findById(uid);
+        const usuarioDB = await Usuario.findById(uid);
 
 
-            if (!usuarioDB) {
-                return res.status(404).json({
-                    ok: false,
-                    msg: 'No existe un usuario con ese id'
-                });
-            }
-
-            const usuarioEliminado = await Usuario.findByIdAndDelete(uid);
-
-            res.status(200).json({
-                ok: true,
-                msg: "Se elimino el usuario "
-            })
-        }catch (error){
-            res.status(500).json({
+        if (!usuarioDB) {
+            return res.status(404).json({
                 ok: false,
-                msg: "Hable con el administrador"
-            })
+                msg: 'No existe un usuario con ese id'
+            });
         }
+
+        const usuarioEliminado = await Usuario.findByIdAndDelete(uid);
+
+        res.status(200).json({
+            ok: true,
+            msg: "Se elimino el usuario "
+        })
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: "Hable con el administrador"
+        })
+    }
 }
 
 
-
-
-    module.exports = {
-        getUsuarios,
-        crearUsuario,
-        actualizarUsuario,
-        borrarUsuario
-    }
+module.exports = {
+    getUsuarios,
+    crearUsuario,
+    actualizarUsuario,
+    borrarUsuario
+}

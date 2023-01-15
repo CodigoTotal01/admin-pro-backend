@@ -9,6 +9,9 @@ const app = express();
 //configurar cors 
 //modleware, eejcuta siempre la funcion siempre que pase por este punto
 app.use(cors());
+//desplegar una pagina interna (public)desde mi servidor de express ->
+
+app.use(express.static('public'));
 
 //Lectura y parseo del body
 app.use(express.json())
@@ -29,8 +32,15 @@ app.get('/', (req, res) => {
 
 
 app.use('/api/usuarios', require("./routes/usuarios"))
+app.use('/api/hospitales', require("./routes/hospitales"))
+app.use('/api/medicos', require("./routes/medicos"))
 //ruta - (req - res) controlador
 app.use('/api/login', require("./routes/auth"))
+app.use('/api/todo', require("./routes/busqueda"))
+app.use('/api/upload', require("./routes/uploads"))
+
+
+
 
 
 
