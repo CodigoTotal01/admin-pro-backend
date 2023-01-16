@@ -89,9 +89,25 @@ const googleSingIn  = async (req, res = response) =>{
     }
 }
 
+// Funcion actilization token of token user - New Token New - for programers
+const renewToken   = async (req, res = response) => {
+    //darle una nueva vida al token
+    const uid = req.uid; // del req -> middleware -> validarToken
+
+    //Generar JWT
+    const token = await generarJWT(uid); // id or _id
+
+    res.json({
+        ok: true,
+        token
+    })
+}
+
+
 
 // LA forma tiene que hacer match con el payload  -> si no el token queda invalidado , semilla o palabra secreta
 module.exports = {
     login,
-    googleSingIn
+    googleSingIn,
+    renewToken
 }
