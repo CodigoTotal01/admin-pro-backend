@@ -4,7 +4,7 @@
 
 const {Router} = require('express')
 const {check} = require('express-validator')
-const {crearMedico, actualizarMedico, borrarMedico, getMedicos} = require("../controllers/medicos");
+const {crearMedico, actualizarMedico, borrarMedico, getMedicos, getMedicoById} = require("../controllers/medicos");
 const {validarJWT} = require("../middlewares/validar-jwt");
 const {validarCampos} = require("../middlewares/validar-campos");
 
@@ -32,5 +32,12 @@ router.delete("/:id",
     validarJWT,
     borrarMedico
 );
+
+
+router.get("/:id",
+    validarJWT,
+    getMedicoById
+);
+
 
 module.exports = router; // exportacion por defecto

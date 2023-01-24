@@ -97,8 +97,16 @@ const actualizarUsuario = async (req, res = response) => {
 
                 }
             }
-
-            campos.email = email;
+            //valido para usuarios que no son de google 
+            if(!usuarioDB.google){
+                campos.email = email;
+            }else if(usuarioDB.email !== email){
+                res.status(400).json({
+                    ok: false,
+                    msg: "Usuario de google no puede cambiar de correo"
+                });
+            }
+       
             //actualizar el usuario en la db, cmoomngoose nos mandara la informacionde ANTES como se veia, peor molesta
             const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, {new: true});
 

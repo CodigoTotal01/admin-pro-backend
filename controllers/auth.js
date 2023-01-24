@@ -1,62 +1,64 @@
-const {response} = require("express");
+const { response } = require("express");
 const bcrypt = require('bcryptjs')
 const Usuario = require("../models/usuarios")
-const {generarJWT} = require("../helpers/jwt");
-const {googleVerify} = require("../helpers/google-verify");
-const login  = async (req, res = response) => {
+const { generarJWT } = require("../helpers/jwt");
+const { googleVerify } = require("../helpers/google-verify");
+const { getMenuFrontEnd } = require("../helpers/menu-frontend");
+const login = async (req, res = response) => {
 
-    const {email, password} = req.body;
-        try{
-            //verificar email
-            const usuarioDB = await Usuario.findOne({email});
+    const { email, password } = req.body;
+    try {
+        //verificar email
+        const usuarioDB = await Usuario.findOne({ email });
 
-            if(!usuarioDB){
-                res.status(404).json({
-                    ok: true,
-                    msg: "El correo o contraseña son incorrectos (EM)"
-                })
-            }
-
-            //verificar contraseña _ encriptada
-            const validPassword = bcrypt.compareSync(password, usuarioDB.password)
-
-            if(!validPassword){
-                res.status(404).json({
-                    ok: true,
-                    msg: "El correo o contraseña son incorrectos (PW)"
-                })
-            }
-
-            console.log(usuarioDB)
-            const token = await generarJWT(usuarioDB._id); // id or _id
-
-
-
-            res.status(200).json({
-                ok: true,
-                token
-            })
-        }catch (error){
-            console.log(error);
-            res.status(500).json({
+        if (!usuarioDB) {
+            res.status(404).json({
                 ok: false,
-                msg: "Hable con el administrador"
+                msg: "El correo o contraseña son incorrectos (EM)"
             })
         }
+
+        //verificar contraseña _ encriptada
+        const validPassword = bcrypt.compareSync(password, usuarioDB.password)
+
+        if (!validPassword) {
+            res.status(404).json({
+                ok: false,
+                msg: "El correo o contraseña son incorrectos (PW)"
+            })
+        }
+
+        console.log(usuarioDB)
+        const token = await generarJWT(usuarioDB._id); // id or _id
+
+
+
+        res.status(200).json({
+            ok: true,
+            token,
+            menu: getMenuFrontEnd(usuarioDB.role)
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: "Hable con el administrador"
+        })
+    }
 }
 
 
-const googleSingIn  = async (req, res = response) =>{
+const googleSingIn = async (req, res = response) => {
 
     try {
-        const {email, name, picture} = await googleVerify(req.body.token);
+        const { email, name, picture } = await googleVerify(req.body.token);
 
 
-        const usuariosDB = await  Usuario.findOne(({email}));
+        const usuariosDB = await Usuario.findOne(({ email }));
 
         let usuario;
 
-        if(!usuariosDB){
+        if (!usuariosDB) {
             usuario = new Usuario({
                 nombre: name,
                 email,
@@ -64,7 +66,7 @@ const googleSingIn  = async (req, res = response) =>{
                 img: picture,
                 google: true
             });
-        }else{
+        } else {
             usuario = usuariosDB;
             usuario.google = true;
         }
@@ -77,11 +79,11 @@ const googleSingIn  = async (req, res = response) =>{
 
         res.json({
             ok: true,
-            email, name, picture,
-            token
+            token,
+            menu: getMenuFrontEnd(usuario.role)
 
         })
-    }catch (e) {
+    } catch (e) {
         res.status(400).json({
             ok: false,
             msg: "Token de google no es correcto"
@@ -90,18 +92,36 @@ const googleSingIn  = async (req, res = response) =>{
 }
 
 // Funcion actilization token of token user - New Token New - for programers
-const renewToken   = async (req, res = response) => {
+const renewToken = async (req, res = response) => {
     //darle una nueva vida al token
     const uid = req.uid; // del req -> middleware -> validarToken
 
     //Generar JWT
     const token = await generarJWT(uid); // id or _id
 
-    res.json({
-        ok: true,
-        token
-    })
+
+    try {
+
+
+        const usuario = await Usuario.findById(uid);
+        res.json({
+            ok: true,
+            token,
+            usuario,
+            menu: getMenuFrontEnd(usuario.role)
+        })
+
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({
+            ok: false,
+            msg: "No existe el cliente con ese id"
+        })
+    }
 }
+
+
+
 
 
 

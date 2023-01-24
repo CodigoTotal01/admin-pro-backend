@@ -1,9 +1,11 @@
 const Usuario = require('../models/usuarios')
 const Hospital = require('../models/hospital')
 const Medico = require('../models/medicos')
+
 const fs = require("fs");
 
 const borrarImagen = ( path ) => {
+    console.log(path)
     if ( fs.existsSync( path ) ) {
         // borrar la imagen anterior
         fs.unlinkSync( path );
@@ -14,8 +16,9 @@ const borrarImagen = ( path ) => {
 const actualizarImagen = async(tipo, id, nombreArchivo) => {
 
     let pathViejo = '';
-
+    console.log("el tipo: " , tipo);
     switch( tipo ) {
+
         case 'medicos':
             const medico = await Medico.findById(id);
             if ( !medico ) {
@@ -35,7 +38,6 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
         case 'hospitales':
             const hospital = await Hospital.findById(id);
             if ( !hospital ) {
-                console.log('No es un hospital por id');
                 return false;
             }
 
@@ -52,12 +54,11 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
 
             const usuario = await Usuario.findById(id);
             if ( !usuario ) {
-                console.log('No es un usuario por id');
                 return false;
             }
 
-            pathViejo = `./uploads/ususarios/${ usuario.img }`;
-            console.log(pathViejo)
+            pathViejo = `./uploads/usuarios/${ usuario.img }`;
+  
             borrarImagen( pathViejo );
 
             usuario.img = nombreArchivo;
