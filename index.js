@@ -5,6 +5,8 @@ var cors = require("cors")
 //crear el servidor de express
 const app = express(); 
 
+const path = require('path')
+
 
 //configurar cors 
 //modleware, eejcuta siempre la funcion siempre que pase por este punto
@@ -40,6 +42,9 @@ app.use('/api/todo', require("./routes/busqueda"))
 app.use('/api/upload', require("./routes/uploads"))
 
 
+app.get('*', (req, res)=>{
+res.sendFile(path.resolve(__dirname,'public/index.html'))
+})
 
 
 
