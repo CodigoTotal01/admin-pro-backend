@@ -28,7 +28,6 @@ const login = async (req, res = response) => {
             })
         }
 
-        console.log(usuarioDB)
         const token = await generarJWT(usuarioDB._id); // id or _id
 
 
@@ -39,7 +38,6 @@ const login = async (req, res = response) => {
             menu: getMenuFrontEnd(usuarioDB.role)
         })
     } catch (error) {
-        console.log(error);
         res.status(500).json({
             ok: false,
             msg: "Hable con el administrador"
@@ -112,7 +110,6 @@ const renewToken = async (req, res = response) => {
         })
 
     } catch (err) {
-        console.log(err);
         res.status(400).json({
             ok: false,
             msg: "No existe el cliente con ese id"

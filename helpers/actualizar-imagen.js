@@ -5,7 +5,6 @@ const Medico = require('../models/medicos')
 const fs = require("fs");
 
 const borrarImagen = ( path ) => {
-    console.log(path)
     if ( fs.existsSync( path ) ) {
         // borrar la imagen anterior
         fs.unlinkSync( path );
@@ -16,13 +15,11 @@ const borrarImagen = ( path ) => {
 const actualizarImagen = async(tipo, id, nombreArchivo) => {
 
     let pathViejo = '';
-    console.log("el tipo: " , tipo);
     switch( tipo ) {
 
         case 'medicos':
             const medico = await Medico.findById(id);
             if ( !medico ) {
-                console.log('No es un médico por id');
                 return false;
             }
 

@@ -24,9 +24,7 @@ const getTodo = async (req, res = response) => {
 }
 
 const getDocumentoColeccion = async (req, res = response) => {
-    console.log("Ekeutandoce ")
     const {busqueda, tabla} = req.params;
-    console.log(busqueda, tabla)
     const regex = new RegExp(busqueda, 'i'); //insencible
 
     let data = [];

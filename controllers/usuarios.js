@@ -86,7 +86,6 @@ const actualizarUsuario = async (req, res = response) => {
 
 
             if (usuarioDB.email !== email) {
-                console.log("Soy una consulta inecesaria ")
                 //cambiar a un correo electronico que existe en mi base de datos
                 const existeEmail = await Usuario.findOne({email});
 

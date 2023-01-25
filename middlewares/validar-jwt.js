@@ -8,7 +8,6 @@ const Usuario = require('../models/usuarios')
 
 const validarJWT = (req, res = response, next) => {
 
-    console.log("pasa")
     //Leer token ->  req -> header
     const token = req.header('x-token');
 
@@ -21,7 +20,6 @@ const validarJWT = (req, res = response, next) => {
 
         next();
     } catch (error) {
-        console.log("error en el js ")
         return res.status(401).json({
             ok: false,
             errors: "El token no es valido"
@@ -55,7 +53,6 @@ const validarAdminRol = async (req, res = response, next) => {
 
         next(); //! si admin lograra pasar 
     } catch (error) {
-        console.log("error en el js ")
         return res.status(500).json({
             ok: false,
             errors: "Hable con el administrador (validar Rol)"
@@ -93,7 +90,6 @@ const validarAdmin_ROLE_o_MismoUsuario = async (req, res = response, next) => {
 
 
     } catch (error) {
-        console.log("error en el js ")
         return res.status(500).json({
             ok: false,
             errors: "Hable con el administrador (validar Rol)"
